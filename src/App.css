@@ -1,1 +1,10 @@
 /* All styles handled by Tailwind CSS */
+.nav-link {
+  color: #333;
+  border-radius: 8px;
+}
+
+.nav-link.active {
+  background-color: #d4af37; /* gold */
+  color: #fff;
+}

@@ -25,3 +25,17 @@ export const addProduct = async (product) => {
 
     return data;
 };
+
+
+
+export const getProducts = async () => {
+    try {
+        const { data, error } = await supabase.from('products').select('*');
+        if (error) throw new Error(error)
+        return data;
+    } catch (error) {
+        console.log('Error:', error)
+        throw new Error(error)
+
+    }
+}

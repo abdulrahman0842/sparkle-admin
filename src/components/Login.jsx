@@ -1,40 +1,31 @@
 import { useState } from "react";
-import { supabase } from "../services/supabaseClient";
+import { loginUser } from '../services/AuthService.js'
+import { useNavigate } from "react-router-dom";
 
-export default function Login({ onAuthSuccess }) {
+export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState("");
+    const navigate = useNavigate();
 
     const handleSignIn = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError("");
+        setError(null);
         setSuccessMessage("");
 
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password,
-            });
+            await loginUser(email, password)
+            navigate('/', { replace: true })
+            setLoading(false)
 
-            if (error) throw error;
-
-            if (onAuthSuccess) {
-                onAuthSuccess(data.user);
-            }
-            setEmail("");
-            setPassword("");
-            setSuccessMessage("Successfully signed in!");
-        } catch (err) {
-            setError(err.message || "Failed to sign in");
-        } finally {
-            setLoading(false);
+        } catch (error) {
+            setError(error)
+            setLoading(false)
         }
     };
-
 
     return (
         <div className="min-vh-100 d-flex justify-content-center align-items-center px-3">
@@ -94,6 +85,7 @@ export default function Login({ onAuthSuccess }) {
                         {loading ? "Signing in..." : "Sign In"}
                     </button>
                 </form>
+                {error && <div className="text-danger py-2 d-flex justify-content-center">{error.toString()}</div>}
             </div>
         </div>
 
