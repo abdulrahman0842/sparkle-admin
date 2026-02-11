@@ -1,9 +1,7 @@
 import { supabase } from "./supabaseClient.js";
 
 export const addProduct = async (product) => {
-    console.log(product)
     const { name, description, price, category, images } = product;
-
     const { data, error } = await supabase
         .from("products")
         .insert([
@@ -26,7 +24,17 @@ export const addProduct = async (product) => {
     return data;
 };
 
-
+export const updateProduct = async (product) => {
+    try {
+        let { data, error } = await supabase.from('products').update(product).eq("id", product.id).select().single()
+        console.log("DATA:", data, "   ERROR:", error)
+        if (error) throw new Error(error)
+        return data
+    } catch (error) {
+        console.log("Error:", error)
+        throw new Error(error)
+    }
+}
 
 export const getProducts = async () => {
     try {
@@ -38,4 +46,16 @@ export const getProducts = async () => {
         throw new Error(error)
 
     }
+}
+
+export const getProductById = async (id) => {
+    try {
+        const { data, error } = await supabase.from('products').select('*').eq('id', id).maybeSingle()
+        if (error) throw new Error(error)
+        return data
+    } catch (error) {
+        console.log("Error:", error)
+        throw new Error(error)
+    }
+
 }

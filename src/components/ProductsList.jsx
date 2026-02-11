@@ -68,7 +68,11 @@ const ProductsList = () => {
                             <div className="d-flex gap-2">
                                 <button
                                     className="btn btn-outline-primary btn-sm"
-                                    onClick={() => navigate('edit-products')}
+                                    onClick={() => navigate(`edit/${product.id}`, {
+                                        state: {
+                                            isEditing: true, product: product
+                                        }
+                                    })}
                                 >
                                     Edit
                                 </button>

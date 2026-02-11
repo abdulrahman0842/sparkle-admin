@@ -9,6 +9,7 @@ import Collections from './pages/Collections'
 import AddProductForm from './components/AddProduct'
 import ProductsList from './components/ProductsList'
 import EditProducts from './components/EditProducts'
+import ProductForm from './components/ProductForm'
 
 
 
@@ -24,8 +25,8 @@ function App() {
         </ProtectedRoute>} >
         <Route path="/products" element={<Products />} >
           <Route index element={<ProductsList />} />
-          <Route path="add-products" element={<AddProductForm />} />
-          <Route path="edit-products" element={<EditProducts />} />
+          <Route path="add" element={<ProductForm />} />
+          <Route path="edit/:id" element={<ProductForm />} />
         </Route>
 
         <Route path="categories" element={<Categories />} />
