@@ -59,3 +59,17 @@ export const getProductById = async (id) => {
     }
 
 }
+
+export const deleteProduct = async (id) => {
+    try {
+        const { data, error } = await supabase.from('products').delete().eq('id', id).select();
+        if (error) {
+            console.error('Supabase delete error:', error);
+            throw new Error(error.message || 'Failed to delete product');
+        }
+        return data;
+    } catch (err) {
+        console.error('Delete product error:', err);
+        throw new Error(err.message || err);
+    }
+}

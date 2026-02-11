@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { getProducts } from "../services/productService";
+import { getProducts, deleteProduct } from "../services/productService";
 import { useNavigate } from "react-router-dom";
 const ProductsList = () => {
     const [loading, setloading] = useState(false)
     const [products, setproducts] = useState([])
     const [error, seterror] = useState(null)
+    const [deletingIds, setDeletingIds] = useState([])
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -78,9 +79,26 @@ const ProductsList = () => {
                                 </button>
                                 <button
                                     className="btn btn-outline-danger btn-sm"
-                                // onClick={() => handleDelete(product.id)}
+                                    onClick={async () => {
+                                        const ok = window.confirm('Delete this product? This action cannot be undone.');
+                                        if (!ok) return;
+                                        seterror(null);
+                                        const backup = products;
+                                        // optimistic remove
+                                        setproducts(prev => prev.filter(p => p.id !== product.id));
+                                        setDeletingIds(prev => [...prev, product.id]);
+                                        try {
+                                            await deleteProduct(product.id);
+                                        } catch (err) {
+                                            setproducts(backup);
+                                            seterror(err.message || 'Failed to delete product');
+                                        } finally {
+                                            setDeletingIds(prev => prev.filter(id => id !== product.id));
+                                        }
+                                    }}
+                                    disabled={deletingIds.includes(product.id)}
                                 >
-                                    Delete
+                                    {deletingIds.includes(product.id) ? 'Deleting...' : 'Delete'}
                                 </button>
                             </div>
 

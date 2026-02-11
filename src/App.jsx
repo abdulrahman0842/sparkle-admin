@@ -1,14 +1,12 @@
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
-import Login from './components/Login'
+import Login from './pages/Login'
 import ProtectedRoute from './routes/ProtectedRoute'
 import Dashboard from './pages/Dashboard'
 import Products from './pages/Products'
 import Categories from './pages/Categories'
 import Collections from './pages/Collections'
-import AddProductForm from './components/AddProduct'
 import ProductsList from './components/ProductsList'
-import EditProducts from './components/EditProducts'
 import ProductForm from './components/ProductForm'
 
 
