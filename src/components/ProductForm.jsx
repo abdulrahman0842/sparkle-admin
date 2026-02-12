@@ -12,9 +12,9 @@ const ProductForm = () => {
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        price: "",
+        basePrice: "",
         category: "",
-        images: [""],
+        thumbnailImage: "",
     });
 
     useEffect(() => {
@@ -45,23 +45,23 @@ const ProductForm = () => {
         setFormData({ ...formData, [name]: value });
     };
 
-    // Handle image input change
-    const handleImageChange = (index, value) => {
-        const updatedImages = [...formData.images];
-        updatedImages[index] = value;
-        setFormData({ ...formData, images: updatedImages });
-    };
+    // // Handle image input change
+    // const handleImageChange = (index, value) => {
+    //     const updatedImages = [...formData.images];
+    //     updatedImages[index] = value;
+    //     setFormData({ ...formData, images: updatedImages });
+    // };
 
-    // Add new image field
-    const addImageField = () => {
-        setFormData({ ...formData, images: [...formData.images, ""] });
-    };
+    // // Add new image field
+    // const addImageField = () => {
+    //     setFormData({ ...formData, images: [...formData.images, ""] });
+    // };
 
-    // Remove image field
-    const removeImageField = (index) => {
-        const updatedImages = formData.images.filter((_, i) => i !== index);
-        setFormData({ ...formData, images: updatedImages });
-    };
+    // // Remove image field
+    // const removeImageField = (index) => {
+    //     const updatedImages = formData.images.filter((_, i) => i !== index);
+    //     setFormData({ ...formData, images: updatedImages });
+    // };
 
     // Submit
     const handleSubmit = async (e) => {
@@ -79,9 +79,9 @@ const ProductForm = () => {
             setFormData({
                 name: "",
                 description: "",
-                price: "",
+                basePrice: "",
                 category: "",
-                images: [""],
+                thumbnailImage: "",
             });
         } catch (err) {
             alert("Failed to add product", err);
@@ -133,15 +133,15 @@ const ProductForm = () => {
                             </div>
                         </div>
 
-                        {/* Price + Category */}
+                        {/* basePrice + Category */}
                         <div className="row">
                             <div className="col-md-6 mb-3">
-                                <label className="form-label">Price</label>
+                                <label className="form-label">Base Price</label>
                                 <input
                                     type="number"
                                     className="form-control"
-                                    name="price"
-                                    value={formData.price}
+                                    name="basePrice"
+                                    value={formData.basePrice}
                                     onChange={handleChange}
                                     required
                                 />
@@ -167,9 +167,19 @@ const ProductForm = () => {
 
                         {/* Image URLs */}
                         <div className="mb-4">
-                            <label className="form-label">Image URLs</label>
-
-                            {formData.images.map((img, index) => (
+                            <label className="form-label">Thumbnail Image</label>
+                                <div  className="d-flex gap-2 mb-2">
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Image URL"
+                                        value={formData.thumbnailImage}
+                                        
+                                        required
+                                    />
+                                    </div>
+                           
+ {/* {formData.images.map((img, index) => (
                                 <div key={index} className="d-flex gap-2 mb-2">
                                     <input
                                         type="text"
@@ -193,14 +203,13 @@ const ProductForm = () => {
                                     )}
                                 </div>
                             ))}
-
                             <button
                                 type="button"
                                 className="btn btn-outline-primary btn-sm"
                                 onClick={addImageField}
                             >
                                 + Add Image
-                            </button>
+                            </button> */}
                         </div>
 
                         {/* Actions */}

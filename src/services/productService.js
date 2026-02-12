@@ -1,16 +1,16 @@
 import { supabase } from "./supabaseClient.js";
 
 export const addProduct = async (product) => {
-    const { name, description, price, category, images } = product;
+    const { name, description, basePrice, category, thumbnailImage } = product;
     const { data, error } = await supabase
         .from("products")
         .insert([
             {
                 name,
                 description,
-                price: Number(price),
+                price: Number(basePrice),
                 category,
-                images,
+                thumbnailImage,
             },
         ])
         .select()

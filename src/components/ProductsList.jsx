@@ -7,7 +7,23 @@ const ProductsList = () => {
     const [error, seterror] = useState(null)
     const [deletingIds, setDeletingIds] = useState([])
     const navigate = useNavigate()
-
+    const handleDelete = async (product) => {
+        const ok = window.confirm('Delete this product? This action cannot be undone.');
+        if (!ok) return;
+        seterror(null);
+        const backup = products;
+        // optimistic remove
+        setproducts(prev => prev.filter(p => p.id !== product.id));
+        setDeletingIds(prev => [...prev, product.id]);
+        try {
+            await deleteProduct(product.id);
+        } catch (err) {
+            setproducts(backup);
+            seterror(err.message || 'Failed to delete product');
+        } finally {
+            setDeletingIds(prev => prev.filter(id => id !== product.id));
+        }
+    }
     useEffect(() => {
         async function loadProducts() {
             setloading(true)
@@ -36,24 +52,22 @@ const ProductsList = () => {
 
 
             {products.length > 0 && products.map((product) => (
-                <div key={product.id} className="col-12">
+                <div key={product.id} className="col-6">
                     <div className="card shadow-sm">
                         <div className="card-body d-flex align-items-center gap-3">
 
                             <div className="d-flex gap-2">
-                                {product.images.slice(0, 3).map((img, i) => (
-                                    <img
-                                        key={i}
-                                        src={img}
-                                        alt="product"
-                                        className="rounded border"
-                                        style={{
-                                            width: "60px",
-                                            height: "60px",
-                                            objectFit: "cover",
-                                        }}
-                                    />
-                                ))}
+                                <img
+                                    src={product.thumbnailImage}
+                                    alt="product"
+                                    className="rounded border"
+                                    style={{
+                                        width: "60px",
+                                        height: "60px",
+                                        objectFit: "cover",
+                                    }}
+                                />
+
                             </div>
 
                             <div className="flex-grow-1">
@@ -62,13 +76,13 @@ const ProductsList = () => {
                                     {product.category}
                                 </small>
                                 <div className="fw-semibold mt-1">
-                                    ₹{product.price}
+                                    ₹{product.basePrice}
                                 </div>
                             </div>
 
-                            <div className="d-flex gap-2">
+                            <div className="d-flex flex-column gap-2">
                                 <button
-                                    className="btn btn-outline-primary btn-sm"
+                                    className="btn btn-secondary btn-sm"
                                     onClick={() => navigate(`edit/${product.id}`, {
                                         state: {
                                             isEditing: true, product: product
@@ -78,27 +92,17 @@ const ProductsList = () => {
                                     Edit
                                 </button>
                                 <button
-                                    className="btn btn-outline-danger btn-sm"
-                                    onClick={async () => {
-                                        const ok = window.confirm('Delete this product? This action cannot be undone.');
-                                        if (!ok) return;
-                                        seterror(null);
-                                        const backup = products;
-                                        // optimistic remove
-                                        setproducts(prev => prev.filter(p => p.id !== product.id));
-                                        setDeletingIds(prev => [...prev, product.id]);
-                                        try {
-                                            await deleteProduct(product.id);
-                                        } catch (err) {
-                                            setproducts(backup);
-                                            seterror(err.message || 'Failed to delete product');
-                                        } finally {
-                                            setDeletingIds(prev => prev.filter(id => id !== product.id));
-                                        }
-                                    }}
+                                    className="btn btn-danger btn-sm"
+                                    onClick={() => handleDelete(product)}
                                     disabled={deletingIds.includes(product.id)}
                                 >
                                     {deletingIds.includes(product.id) ? 'Deleting...' : 'Delete'}
+                                </button>
+                                <button
+                                    className="btn btn-warning btn-sm"
+                                    onClick={() => navigate(`variant/${product.id}`)}
+                                >
+                                    Variants
                                 </button>
                             </div>
 
