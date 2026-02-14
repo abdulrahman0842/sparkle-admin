@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { addProduct, getProductById, updateProduct } from "../services/productService";
 
+
 // Add error management here
 const ProductForm = () => {
     const { id } = useParams();

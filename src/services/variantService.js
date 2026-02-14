@@ -1,4 +1,4 @@
-import { supabase } from "./supabaseClient";
+import { supabase } from "./SupabaseClient";
 export const getVariantsByProductId = async (productId) => {
     try {
         const { data, error } = await supabase
@@ -70,7 +70,7 @@ export const deleteVariant = async (variantId) => {
             .delete()
             .eq('id', variantId)
             .select();
-            console.log('data',data,'errpr',error)
+        console.log('data', data, 'errpr', error)
         if (error) throw new Error(error.message);
         return data;
     } catch (err) {
