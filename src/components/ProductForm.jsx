@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { addProduct, getProductById, updateProduct } from "../services/supabaseClient.js";
+import { addProduct, getProductById, updateProduct } from "../services/productService";
 
 
 // Add error management here
