@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import VariantModal from "../components/VariantModal";
-import { addVariant, updateVariant, deleteVariant, getVariantsByProductId } from "../services/VariantService";
+import { addVariant, updateVariant, deleteVariant, getVariantsByProductId } from "../services/variantService";
 
 const Variant = () => {
     const { productId } = useParams();
