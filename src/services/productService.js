@@ -1,4 +1,4 @@
-import { supabase } from "./SupabaseClient.js";
+import { supabase } from "./supabaseClient.js";
 
 export const addProduct = async (product) => {
     const { name, description, price, category, thumbnailImage } = product;

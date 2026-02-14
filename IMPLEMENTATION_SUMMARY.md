@@ -19,7 +19,7 @@
 - **Auth State Changes**: Listens to Supabase auth changes in real-time
 - **Session Persistence**: Keeps users logged in on page refresh
 
-### 3. **Supabase Client** (`src/services/SupabaseClient.js`)
+### 3. **Supabase Client** (`src/services/supabaseClient.js`)
 - Environment variable configuration
 - Exports configured Supabase client ready to use
 
@@ -121,7 +121,7 @@ sladmin/
 │   ├── components/
 │   │   └── Login.jsx              ← Main login component
 │   ├── services/
-│   │   └── SupabaseClient.js      ← Supabase config
+│   │   └── supabaseClient.js      ← Supabase config
 │   ├── App.jsx                     ← Auth management & dashboard
 │   ├── main.jsx
 │   └── index.css                   ← Tailwind styles

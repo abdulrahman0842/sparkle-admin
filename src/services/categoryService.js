@@ -1,4 +1,4 @@
-import { supabase } from './SupabaseClient';
+import { supabase } from './supabaseClient';
 
 export async function getCategories() {
     const { data, error } = await supabase

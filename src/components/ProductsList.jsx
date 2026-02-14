@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getProducts, deleteProduct } from "../services/ProductService";
+import { getProducts, deleteProduct } from "../services/supabaseClient";
 import { useNavigate } from "react-router-dom";
 const ProductsList = () => {
     const [loading, setloading] = useState(false)
