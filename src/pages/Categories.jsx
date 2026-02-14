@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import * as categoryService from '../services/CategoryService';
+import { addCategory, getCategories, updateCategory, deleteCategory } from '../services/CategoryService';
 
 const Categories = () => {
     const [categories, setCategories] = useState([]);
@@ -21,7 +21,7 @@ const Categories = () => {
         setLoading(true);
         setError('');
         try {
-            const data = await categoryService.getCategories();
+            const data = await getCategories();
             setCategories(data);
         } catch (err) {
             setError(err.message || 'Failed to load categories');
@@ -53,7 +53,7 @@ const Categories = () => {
         setAdding(true);
         setNewName('');
         try {
-            const created = await categoryService.addCategory(name);
+            const created = await addCategory(name);
             setCategories(prev => prev.map(c => (c.id === tempId ? created : c)));
         } catch (err) {
             // rollback
@@ -89,7 +89,7 @@ const Categories = () => {
         setEditingName('');
         setError('');
         try {
-            await categoryService.updateCategory(id, name);
+            await updateCategory(id, name);
         } catch (err) {
             // rollback
             setCategories(prev);
@@ -103,7 +103,7 @@ const Categories = () => {
         // optimistic remove
         setCategories(prev => prev.filter(c => c.id !== id));
         try {
-            await categoryService.deleteCategory(id);
+            await deleteCategory(id);
         } catch (err) {
             setCategories(backup);
             setError(err.message || 'Failed to delete category');
