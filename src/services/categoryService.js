@@ -15,7 +15,6 @@ export async function addCategory(name) {
         .from('categories')
         .insert(payload)
         .select()
-        .single();
     if (error) throw error;
     return data;
 }
@@ -27,7 +26,6 @@ export async function updateCategory(id, name) {
         .update(payload)
         .eq('id', id)
         .select()
-        .single();
     if (error) throw error;
     return data;
 }
