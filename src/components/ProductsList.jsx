@@ -7,7 +7,7 @@ const ProductsList = () => {
     const [error, seterror] = useState(null)
     const [deletingIds, setDeletingIds] = useState([])
     const navigate = useNavigate()
-    
+
     const handleDelete = async (product) => {
         const ok = window.confirm('Delete this product? This action cannot be undone.');
         if (!ok) return;

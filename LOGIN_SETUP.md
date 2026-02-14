@@ -72,7 +72,7 @@ sladmin/
 │   ├── components/
 │   │   └── Login.jsx          # Login/Sign-up component
 │   ├── services/
-│   │   └── supabaseClient.js  # Supabase configuration
+│   │   └── SupabaseClient.js  # Supabase configuration
 │   ├── App.jsx                # Main app with auth management
 │   ├── main.jsx               # Entry point
 │   └── index.css              # Tailwind directives

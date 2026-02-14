@@ -76,7 +76,7 @@ Create a test account:
 |------|---------|
 | `src/components/Login.jsx` | Login/signup form |
 | `src/App.jsx` | Auth state & dashboard |
-| `src/services/supabaseClient.js` | Supabase setup |
+| `src/services/SupabaseClient.js` | Supabase setup |
 | `.env.local` | Your credentials (keep secret!) |
 | `tailwind.config.js` | Tailwind configuration |
 
