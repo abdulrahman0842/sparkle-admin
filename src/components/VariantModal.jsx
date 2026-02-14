@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 const VariantModal = ({ variant, onSave, onClose }) => {
     const [formData, setFormData] = useState({
         color: "",
-        price: "",
         images: [""],
     });
 
@@ -12,13 +11,11 @@ const VariantModal = ({ variant, onSave, onClose }) => {
             if (variant) {
                 setFormData({
                     color: variant.color || "",
-                    price: variant.price || "",
                     images: variant.images || [""],
                 });
             } else {
                 setFormData({
                     color: "",
-                    price: "",
                     images: [""],
                 });
             }
@@ -118,19 +115,6 @@ const VariantModal = ({ variant, onSave, onClose }) => {
                                         }
                                     />
                                 </div>
-                            </div>
-
-                            {/* Price Field */}
-                            <div className="mb-3">
-                                <label className="form-label">Price</label>
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    name="price"
-                                    placeholder="Leave empty to use base price"
-                                    value={formData.price}
-                                    onChange={handleChange}
-                                />
                             </div>
 
                             {/* Images */}

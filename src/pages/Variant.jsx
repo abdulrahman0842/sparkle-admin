@@ -123,7 +123,6 @@ const Variant = () => {
                         <thead>
                             <tr>
                                 <th>Color</th>
-                                <th>Price</th>
                                 <th>Images</th>
                                 <th>Actions</th>
                             </tr>
@@ -145,7 +144,6 @@ const Variant = () => {
                                             {variant.color}
                                         </div>
                                     </td>
-                                    <td>₹{variant.price || "—"}</td>
                                     <td>{variant.images?.length || 0} image(s)</td>
                                     <td>
                                         <button
