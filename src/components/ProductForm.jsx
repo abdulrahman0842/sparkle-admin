@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
-import { addProduct, getProductById, updateProduct } from "../services/productService";
+import { addProduct, getProductById, updateProduct } from "../services/ProductService";
 
 
 // Add error management here
