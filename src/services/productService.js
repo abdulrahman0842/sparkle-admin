@@ -1,14 +1,14 @@
 import { supabase } from "./supabaseClient.js";
 
 export const addProduct = async (product) => {
-    const { name, description, basePrice, category, thumbnailImage } = product;
+    const { name, description, price, category, thumbnailImage } = product;
     const { data, error } = await supabase
         .from("products")
         .insert([
             {
                 name,
                 description,
-                price: Number(basePrice),
+                price: Number(price),
                 category,
                 thumbnailImage,
             },
@@ -63,6 +63,7 @@ export const getProductById = async (id) => {
 export const deleteProduct = async (id) => {
     try {
         const { data, error } = await supabase.from('products').delete().eq('id', id).select();
+        console.log(data,error)
         if (error) {
             console.error('Supabase delete error:', error);
             throw new Error(error.message || 'Failed to delete product');

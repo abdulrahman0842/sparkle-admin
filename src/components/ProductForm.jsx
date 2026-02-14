@@ -2,17 +2,18 @@ import { useState, useEffect } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { addProduct, getProductById, updateProduct } from "../services/productService";
 
-
+// Add error management here
 const ProductForm = () => {
     const { id } = useParams();
     const location = useLocation();
+
 
     let isEditing = id ? true : false;
     const product = location.state?.product;
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        basePrice: "",
+        price: "",
         category: "",
         thumbnailImage: "",
     });
@@ -45,24 +46,6 @@ const ProductForm = () => {
         setFormData({ ...formData, [name]: value });
     };
 
-    // // Handle image input change
-    // const handleImageChange = (index, value) => {
-    //     const updatedImages = [...formData.images];
-    //     updatedImages[index] = value;
-    //     setFormData({ ...formData, images: updatedImages });
-    // };
-
-    // // Add new image field
-    // const addImageField = () => {
-    //     setFormData({ ...formData, images: [...formData.images, ""] });
-    // };
-
-    // // Remove image field
-    // const removeImageField = (index) => {
-    //     const updatedImages = formData.images.filter((_, i) => i !== index);
-    //     setFormData({ ...formData, images: updatedImages });
-    // };
-
     // Submit
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -79,7 +62,7 @@ const ProductForm = () => {
             setFormData({
                 name: "",
                 description: "",
-                basePrice: "",
+                price: "",
                 category: "",
                 thumbnailImage: "",
             });
@@ -133,15 +116,15 @@ const ProductForm = () => {
                             </div>
                         </div>
 
-                        {/* basePrice + Category */}
+                        {/* price + Category */}
                         <div className="row">
                             <div className="col-md-6 mb-3">
-                                <label className="form-label">Base Price</label>
+                                <label className="form-label">Price</label>
                                 <input
                                     type="number"
                                     className="form-control"
-                                    name="basePrice"
-                                    value={formData.basePrice}
+                                    name="price"
+                                    value={formData.price}
                                     onChange={handleChange}
                                     required
                                 />
@@ -168,48 +151,18 @@ const ProductForm = () => {
                         {/* Image URLs */}
                         <div className="mb-4">
                             <label className="form-label">Thumbnail Image</label>
-                                <div  className="d-flex gap-2 mb-2">
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        placeholder="Image URL"
-                                        value={formData.thumbnailImage}
-                                        
-                                        required
-                                    />
-                                    </div>
-                           
- {/* {formData.images.map((img, index) => (
-                                <div key={index} className="d-flex gap-2 mb-2">
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        placeholder="Image URL"
-                                        value={img}
-                                        onChange={(e) =>
-                                            handleImageChange(index, e.target.value)
-                                        }
-                                        required
-                                    />
+                            <div className="d-flex gap-2 mb-2">
+                                <input
+                                    type="text" name="thumbnailImage"
+                                    className="form-control"
+                                    placeholder="Image URL"
+                                    onChange={handleChange}
+                                    value={formData.thumbnailImage}
 
-                                    {formData.images.length > 1 && (
-                                        <button
-                                            type="button"
-                                            className="btn btn-outline-danger"
-                                            onClick={() => removeImageField(index)}
-                                        >
-                                            ✕
-                                        </button>
-                                    )}
-                                </div>
-                            ))}
-                            <button
-                                type="button"
-                                className="btn btn-outline-primary btn-sm"
-                                onClick={addImageField}
-                            >
-                                + Add Image
-                            </button> */}
+                                    required
+                                />
+                            </div>
+
                         </div>
 
                         {/* Actions */}
