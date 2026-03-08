@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import VariantModal from "../components/VariantModal";
 import { addVariant, updateVariant, deleteVariant, getVariantsByProductId } from "../services/variantService";
 import { getProductById } from "../services/productService";
+import ImageWithPreview from "../components/ImageWithPreview";
 
 const Variant = () => {
     const { productId } = useParams();
@@ -75,9 +76,9 @@ const Variant = () => {
             {product && (
                 <div className="card border-0 shadow-sm mb-4 bg-light">
                     <div className="card-body d-flex align-items-center gap-3">
-                        <img 
-                            src={product.thumbnailImage} 
-                            alt={product.name} 
+                        <img
+                            src={product.thumbnailImage}
+                            alt={product.name}
                             className="rounded border"
                             style={{ width: "80px", height: "80px", objectFit: "cover" }}
                         />
@@ -129,11 +130,10 @@ const Variant = () => {
                                 {variants.map(variant => (
                                     <tr key={variant.id}>
                                         <td className="ps-3">
-                                            <img 
-                                                src={variant.images?.[0] || 'https://via.placeholder.com/50'} 
+                                            <ImageWithPreview
+                                                src={variant.images?.[0] || 'https://via.placeholder.com/50'}
                                                 alt="variant"
-                                                className="rounded border"
-                                                style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                                                size="50px"
                                             />
                                         </td>
                                         <td>
@@ -152,14 +152,14 @@ const Variant = () => {
                                             <small className="text-muted">{variant.images?.length || 0} total images</small>
                                         </td>
                                         <td className="text-end pe-3">
-                                            <button 
-                                                className="btn btn-sm btn-light me-2" 
+                                            <button
+                                                className="btn btn-sm btn-light me-2"
                                                 onClick={() => openEditModal(variant)}
                                             >
                                                 Edit
                                             </button>
-                                            <button 
-                                                className="btn btn-sm btn-light text-danger" 
+                                            <button
+                                                className="btn btn-sm btn-light text-danger"
                                                 onClick={() => handleDeleteVariant(variant.id)}
                                             >
                                                 Delete

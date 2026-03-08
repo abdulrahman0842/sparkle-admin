@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { deleteProduct, getProductsByCategory } from "../services/productService";
-import { getCategories } from '../services/CategoryService';
+import { getCategories } from '../services/categoryService';
 import { useNavigate } from "react-router-dom";
-
+import ImageWithPreview from "./ImageWithPreview";
 const ProductsList = () => {
     const [categories, setCategories] = useState([]);
     const [productsByCategory, setProductsByCategory] = useState({});
@@ -69,7 +69,7 @@ const ProductsList = () => {
 
     return (
         <div className="container mt-4 pb-5">
-            
+
             {loadingCats && <div className="text-center py-5">Loading Categories...</div>}
 
             {categories.map((cat) => (
@@ -80,12 +80,12 @@ const ProductsList = () => {
                         style={{ cursor: 'pointer' }}
                     >
                         <div className="d-flex align-items-center gap-3">
-                            <img
+                            <ImageWithPreview
                                 src={cat.image}
                                 alt={cat.name}
-                                className="rounded border"
-                                style={{ width: "45px", height: "45px", objectFit: "cover" }}
+
                             />
+
                             <h6 className="mb-0 text-uppercase fw-bold text-dark">{cat.name}</h6>
                         </div>
 
@@ -108,17 +108,14 @@ const ProductsList = () => {
 
                                             {/* 1. Thumbnail Image */}
                                             <div className="me-3">
-                                                <img
+                                                <ImageWithPreview
                                                     src={product.thumbnailImage}
                                                     alt={product.name}
-                                                    className="rounded border"
-                                                    style={{
-                                                        width: "60px",
-                                                        height: "60px",
-                                                        objectFit: "cover",
-                                                        backgroundColor: "#f8f9fa"
-                                                    }}
+                                                    size="60px"
+
                                                 />
+
+                                                
                                             </div>
 
                                             {/* 2. Product Info */}
