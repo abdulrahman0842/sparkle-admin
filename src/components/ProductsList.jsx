@@ -1,123 +1,172 @@
-import { useEffect, useState, useMemo } from "react";
-import { getProducts, deleteProduct } from "../services/productService";
+import { useEffect, useState } from "react";
+import { deleteProduct, getProductsByCategory } from "../services/productService";
+import { getCategories } from '../services/CategoryService';
 import { useNavigate } from "react-router-dom";
 
 const ProductsList = () => {
-    const [loading, setloading] = useState(false);
-    const [products, setproducts] = useState([]);
-    const [error, seterror] = useState(null);
+    const [categories, setCategories] = useState([]);
+    const [productsByCategory, setProductsByCategory] = useState({});
+    const [loadingCats, setLoadingCats] = useState(false);
+    const [loadingProducts, setLoadingProducts] = useState({});
+    const [expandedCategories, setExpandedCategories] = useState({});
     const [deletingIds, setDeletingIds] = useState([]);
-    const [expandedCategories, setExpandedCategories] = useState({}); // Track collapse state
     const navigate = useNavigate();
 
-    // 1. Group products by category whenever the products list changes
-    const groupedProducts = useMemo(() => {
-        return products.reduce((acc, product) => {
-            const cat = product.category || "Uncategorized";
-            if (!acc[cat]) acc[cat] = [];
-            acc[cat].push(product);
-            return acc;
-        }, {});
-    }, [products]);
+    useEffect(() => {
+        async function loadInitialData() {
+            setLoadingCats(true);
+            try {
+                const catData = await getCategories();
+                setCategories(catData);
+            } catch (err) {
+                console.error("Failed to fetch categories", err);
+            } finally {
+                setLoadingCats(false);
+            }
+        }
+        loadInitialData();
+    }, []);
 
-    // 2. Toggle collapse
-    const toggleCategory = (category) => {
-        setExpandedCategories(prev => ({
-            ...prev,
-            [category]: !prev[category]
-        }));
+    const toggleCategory = async (categoryName) => {
+        const isNowExpanded = !expandedCategories[categoryName];
+        setExpandedCategories(prev => ({ ...prev, [categoryName]: isNowExpanded }));
+
+        if (isNowExpanded && !productsByCategory[categoryName]) {
+            setLoadingProducts(prev => ({ ...prev, [categoryName]: true }));
+            try {
+                const data = await getProductsByCategory(categoryName);
+                setProductsByCategory(prev => ({ ...prev, [categoryName]: data }));
+            } catch (err) {
+                console.error(`Error loading ${categoryName}:`, err);
+            } finally {
+                setLoadingProducts(prev => ({ ...prev, [categoryName]: false }));
+            }
+        }
     };
 
     const handleDelete = async (product) => {
-        const ok = window.confirm('Delete this product? This action cannot be undone.');
+        const ok = window.confirm(`Delete "${product.name}"?`);
         if (!ok) return;
-        
-        const backup = products;
-        setproducts(prev => prev.filter(p => p.id !== product.id));
+
+        const categoryName = product.category;
+        const originalList = productsByCategory[categoryName];
+
+        setProductsByCategory(prev => ({
+            ...prev,
+            [categoryName]: prev[categoryName].filter(p => p.id !== product.id)
+        }));
         setDeletingIds(prev => [...prev, product.id]);
-        
+
         try {
             await deleteProduct(product.id);
         } catch (err) {
-            setproducts(backup);
-            seterror(err.message || 'Failed to delete product');
+            alert("Delete failed. Restoring item...");
+            setProductsByCategory(prev => ({ ...prev, [categoryName]: originalList }));
         } finally {
             setDeletingIds(prev => prev.filter(id => id !== product.id));
         }
     };
 
-    useEffect(() => {
-        async function loadProducts() {
-            setloading(true);
-            try {
-                let data = await getProducts();
-                setproducts(data);
-                // Initialize all categories as expanded by default
-                const initialToggle = {};
-                data.forEach(p => initialToggle[p.category] = true);
-                setExpandedCategories(initialToggle);
-            } catch (err) {
-                seterror(err.message || "Failed to fetch products");
-            } finally {
-                setloading(false);
-            }
-        }
-        loadProducts();
-    }, []);
-
     return (
-        <div className="container mt-4">
-            {loading && <div className="text-center p-5">Loading Products...</div>}
-            {error && <div className="alert alert-danger">{error}</div>}
+        <div className="container mt-4 pb-5">
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h4 className="fw-bold mb-0">Inventory Management</h4>
+                <button className="btn btn-primary btn-sm px-3" onClick={() => navigate('/products/add')}>
+                    + Add Product
+                </button>
+            </div>
 
-            {Object.keys(groupedProducts).map((category) => (
-                <div key={category} className="mb-4">
-                    {/* Category Header */}
-                    <div 
-                        className="d-flex justify-content-between align-items-center p-3 bg-light border rounded cursor-pointer" 
-                        onClick={() => toggleCategory(category)}
+            {loadingCats && <div className="text-center py-5">Loading Categories...</div>}
+
+            {categories.map((cat) => (
+                <div key={cat.id} className="mb-3">
+                    <div
+                        className="d-flex justify-content-between align-items-center p-2 bg-white border rounded shadow-sm"
+                        onClick={() => toggleCategory(cat.name)}
                         style={{ cursor: 'pointer' }}
                     >
-                        <h5 className="mb-0 text-uppercase fw-bold">{category} ({groupedProducts[category].length})</h5>
-                        <span>{expandedCategories[category] ? '▲' : '▼'}</span>
+                        <div className="d-flex align-items-center gap-3">
+                            <img
+                                src={cat.image}
+                                alt={cat.name}
+                                className="rounded border"
+                                style={{ width: "45px", height: "45px", objectFit: "cover" }}
+                            />
+                            <h6 className="mb-0 text-uppercase fw-bold text-dark">{cat.name}</h6>
+                        </div>
+
+                        <div className="d-flex align-items-center gap-3 me-2">
+                            {loadingProducts[cat.name] && (
+                                <div className="spinner-border spinner-border-sm text-primary" role="status"></div>
+                            )}
+                            <span className="text-muted small">
+                                {expandedCategories[cat.name] ? '▲' : '▼'}
+                            </span>
+                        </div>
                     </div>
 
-                    {/* Collapsible Content */}
-                    {expandedCategories[category] && (
-                        <div className="row g-3 mt-1">
-                            {groupedProducts[category].map((product) => (
-                                <div key={product.id} className="col-12 col-md-6">
-                                    <div className="card shadow-sm h-100">
-                                        <div className="card-body d-flex align-items-center gap-3">
-                                            <img
-                                                src={product.thumbnailImage}
-                                                alt={product.name}
-                                                className="rounded border"
-                                                style={{ width: "80px", height: "80px", objectFit: "cover" }}
-                                            />
+                    {expandedCategories[cat.name] && (
+                        <div className="row g-3 mt-1 ms-2 ms-md-4">
+                            {productsByCategory[cat.name]?.map((product) => (
+                                <div key={product.id} className="col-12 col-xl-6">
+                                    <div className="card border-0 shadow-sm bg-white">
+                                        <div className="card-body d-flex justify-content-between align-items-center py-2">
                                             <div className="flex-grow-1">
-                                                <h6 className="mb-1">{product.name}</h6>
-                                                <div className="fw-semibold text-primary">₹{product.price}</div>
+                                                {/* Product Name */}
+                                                <div className="fw-bold text-dark mb-2">{product.name}</div>
+
+                                                {/* Pricing Information */}
+                                                <div className="d-flex align-items-center gap-3 flex-wrap">
+                                                    {/* Final Price (Discounted) */}
+                                                    <span className="text-primary fw-bold">
+                                                        ₹{Math.round(product.price - (product.price * product.discount / 100))}
+                                                    </span>
+
+                                                    {product.discount > 0 && (
+                                                        <>
+                                                            {/* Original Price */}
+                                                            <span className="text-muted text-decoration-line-through ">
+                                                                ₹{product.price}
+                                                            </span>
+
+                                                            {/* Discount Percent */}
+                                                            <span className="badge bg-success-subtle text-success border border-success-subtle py-1" style={{ fontSize: '0.7rem' }}>
+                                                                {product.discount}% OFF
+                                                            </span>
+                                                        </>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div className="d-flex flex-column gap-1">
-                                                <button 
-                                                    className="btn btn-outline-secondary btn-sm"
-                                                    onClick={() => navigate(`edit/${product.id}`, { state: { isEditing: true, product } })}
+
+                                            {/* Action Buttons */}
+                                            <div className="d-flex gap-2">
+                                                <button
+                                                    className="btn btn-sm btn-outline-secondary"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        navigate(`edit/${product.id}`, { state: { product } });
+                                                    }}
                                                 >
                                                     Edit
                                                 </button>
-                                                <button 
-                                                    className="btn btn-outline-danger btn-sm"
-                                                    onClick={() => handleDelete(product)}
-                                                    disabled={deletingIds.includes(product.id)}
-                                                >
-                                                    {deletingIds.includes(product.id) ? '...' : 'Delete'}
-                                                </button>
-                                                <button 
-                                                    className="btn btn-outline-warning btn-sm"
-                                                    onClick={() => navigate(`variant/${product.id}`)}
+                                                <button
+                                                    className="btn btn-sm btn-outline-warning text-dark"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        navigate(`variant/${product.id}`);
+                                                    }}
                                                 >
                                                     Variants
+                                                </button>
+                                                <button
+                                                    className="btn btn-sm btn-outline-danger"
+                                                    disabled={deletingIds.includes(product.id)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDelete(product);
+                                                    }}
+                                                >
+                                                    {deletingIds.includes(product.id) ? '...' : 'Delete'}
                                                 </button>
                                             </div>
                                         </div>

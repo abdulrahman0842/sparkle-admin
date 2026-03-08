@@ -59,7 +59,17 @@ export const getProductById = async (id) => {
     }
 
 }
+export const getProductsByCategory = async (categoryName) => {
+    try {
+        const { data, error } = await supabase.from('products').select('*').eq('category', categoryName)
+        if (error) throw new Error(error)
+        return data ?? []
+    } catch (error) {
+        console.log("Error:", error)
+        throw new Error(error)
+    }
 
+}
 export const deleteProduct = async (id) => {
     try {
         const { data, error } = await supabase.from('products').delete().eq('id', id).select();
