@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import VariantModal from "../components/VariantModal";
 import { addVariant, updateVariant, deleteVariant, getVariantsByProductId } from "../services/variantService";
+import { getProductById } from "../services/productService";
 
 const Variant = () => {
     const { productId } = useParams();
     const navigate = useNavigate();
 
+    const [product, setProduct] = useState(null);
     const [variants, setVariants] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -14,60 +16,40 @@ const Variant = () => {
     const [editingVariant, setEditingVariant] = useState(null);
 
     useEffect(() => {
-        async function fetchVariants() {
+        async function loadInitialData() {
             setLoading(true);
             setError("");
             try {
-                let data = await getVariantsByProductId(productId);
-                setVariants(data);
+                // Fetch Product Details and Variants in parallel
+                const [productData, variantsData] = await Promise.all([
+                    getProductById(productId),
+                    getVariantsByProductId(productId)
+                ]);
+                setProduct(productData);
+                setVariants(variantsData);
             } catch (err) {
-                setError(err.message || "Failed to load variants");
+                setError(err.message || "Failed to load data");
             } finally {
                 setLoading(false);
             }
         }
-        fetchVariants();
+        loadInitialData();
     }, [productId]);
 
-
-
-    function openAddModal() {
-        setEditingVariant(null);
-        setShowModal(true);
-    }
-
-    function openEditModal(variant) {
-        setEditingVariant(variant);
-        setShowModal(true);
-    }
-
-    function closeModal() {
-        setShowModal(false);
-        setEditingVariant(null);
-    }
+    const openAddModal = () => { setEditingVariant(null); setShowModal(true); };
+    const openEditModal = (variant) => { setEditingVariant(variant); setShowModal(true); };
+    const closeModal = () => { setShowModal(false); setEditingVariant(null); };
 
     async function handleSaveVariant(variantData) {
         setError("");
         try {
             if (editingVariant?.id) {
-                // Edit mode
-                // TODO: Replace with actual Supabase update
-
                 const updated = { ...editingVariant, ...variantData };
                 await updateVariant(updated);
-                setVariants(prev =>
-                    prev.map(v => (v.id === editingVariant.id ? updated : v))
-                );
+                setVariants(prev => prev.map(v => (v.id === editingVariant.id ? updated : v)));
             } else {
-                // Add mode
-                // TODO: Replace with actual Supabase insert
-                const newVariant = {
-                    id: `temp-${Date.now()}`,
-                    product_id: productId,
-                    ...variantData,
-                };
-                await addVariant({ product_id: productId, ...variantData })
-                setVariants(prev => [newVariant, ...prev]);
+                const savedVariant = await addVariant({ product_id: productId, ...variantData });
+                setVariants(prev => [savedVariant, ...prev]);
             }
             closeModal();
         } catch (err) {
@@ -76,15 +58,11 @@ const Variant = () => {
     }
 
     async function handleDeleteVariant(variantId) {
-        if (!window.confirm("Delete this variant? This action cannot be undone.")) return;
-
-        setError("");
+        if (!window.confirm("Delete this variant?")) return;
         const backup = variants;
-        // Optimistic delete
         setVariants(prev => prev.filter(v => v.id !== variantId));
         try {
-            await deleteVariant(variantId)
-            alert('Successful deletion')
+            await deleteVariant(variantId);
         } catch (err) {
             setVariants(backup);
             setError(err.message || "Failed to delete variant");
@@ -92,77 +70,106 @@ const Variant = () => {
     }
 
     return (
-        <div className="container">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <div className="d-flex justify-content-center align-items-center">
-                    <button
-                        className="btn btn-outline-secondary btn-sm me-3"
-                        onClick={() => navigate(-1)}
-                    >
-                        ← Back
-                    </button>
-                    <h4 className="d-inline">Product Variants</h4>
+        <div className="container mt-4">
+            {/* 1. Product Header Section */}
+            {product && (
+                <div className="card border-0 shadow-sm mb-4 bg-light">
+                    <div className="card-body d-flex align-items-center gap-3">
+                        <img 
+                            src={product.thumbnailImage} 
+                            alt={product.name} 
+                            className="rounded border"
+                            style={{ width: "80px", height: "80px", objectFit: "cover" }}
+                        />
+                        <div>
+                            <h4 className="mb-1 fw-bold">{product.name}</h4>
+                            <div className="text-muted small">
+                                <span className="badge bg-secondary me-2">{product.category}</span>
+                                <span className="fw-semibold text-primary">Base Price: ₹{product.price}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <button
-                    className="btn btn-primary btn-sm"
-                    onClick={openAddModal}
-                >
-                    + Add Variant
+            )}
+
+            {/* 2. Page Actions */}
+            <div className="d-flex justify-content-between align-items-center mb-3">
+                <button className="btn btn-outline-secondary btn-sm" onClick={() => navigate(-1)}>
+                    ← Back to Products
+                </button>
+                <button className="btn btn-primary btn-sm px-3" onClick={openAddModal}>
+                    + Add New Variant
                 </button>
             </div>
 
             {error && <div className="alert alert-danger py-2">{error}</div>}
 
+            {/* 3. Variants Table */}
             {loading ? (
-                <div className="text-center py-5">Loading variants...</div>
+                <div className="text-center py-5">
+                    <div className="spinner-border text-primary" role="status"></div>
+                    <div className="mt-2 text-muted">Loading variants...</div>
+                </div>
             ) : variants.length === 0 ? (
-                <div className="alert alert-info">No variants yet. Click "+ Add Variant" to create one.</div>
+                <div className="alert alert-info border-0 shadow-sm">
+                    No variants found for this product.
+                </div>
             ) : (
-                <div className="table-responsive">
-                    <table className="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Color</th>
-                                <th>Images</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {variants.map(variant => (
-                                <tr key={variant.id}>
-                                    <td>
-                                        <div className="d-flex align-items-center gap-2">
-                                            <div
-                                                style={{
-                                                    width: "24px",
-                                                    height: "24px",
-                                                    backgroundColor: variant.color,
-                                                    border: "1px solid #ddd",
-                                                    borderRadius: "4px",
-                                                }}
-                                            />
-                                            {variant.color}
-                                        </div>
-                                    </td>
-                                    <td>{variant.images?.length || 0} image(s)</td>
-                                    <td>
-                                        <button
-                                            className="btn btn-sm btn-outline-primary me-2"
-                                            onClick={() => openEditModal(variant)}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            className="btn btn-sm btn-outline-danger"
-                                            onClick={() => handleDeleteVariant(variant.id)}
-                                        >
-                                            Delete
-                                        </button>
-                                    </td>
+                <div className="card shadow-sm border-0">
+                    <div className="table-responsive">
+                        <table className="table table-hover align-middle mb-0">
+                            <thead className="table-light">
+                                <tr>
+                                    <th className="ps-3">Image</th>
+                                    <th>Color Detail</th>
+                                    <th className="text-end pe-3">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {variants.map(variant => (
+                                    <tr key={variant.id}>
+                                        <td className="ps-3">
+                                            <img 
+                                                src={variant.images?.[0] || 'https://via.placeholder.com/50'} 
+                                                alt="variant"
+                                                className="rounded border"
+                                                style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                                            />
+                                        </td>
+                                        <td>
+                                            <div className="d-flex align-items-center gap-2">
+                                                <div
+                                                    style={{
+                                                        width: "18px",
+                                                        height: "18px",
+                                                        backgroundColor: variant.color,
+                                                        border: "1px solid #ddd",
+                                                        borderRadius: "50%",
+                                                    }}
+                                                />
+                                                <span className="text-uppercase small fw-bold">{variant.color}</span>
+                                            </div>
+                                            <small className="text-muted">{variant.images?.length || 0} total images</small>
+                                        </td>
+                                        <td className="text-end pe-3">
+                                            <button 
+                                                className="btn btn-sm btn-light me-2" 
+                                                onClick={() => openEditModal(variant)}
+                                            >
+                                                Edit
+                                            </button>
+                                            <button 
+                                                className="btn btn-sm btn-light text-danger" 
+                                                onClick={() => handleDeleteVariant(variant.id)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
 
