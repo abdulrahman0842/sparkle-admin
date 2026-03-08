@@ -69,13 +69,7 @@ const ProductsList = () => {
 
     return (
         <div className="container mt-4 pb-5">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h4 className="fw-bold mb-0">Inventory Management</h4>
-                <button className="btn btn-primary btn-sm px-3" onClick={() => navigate('/products/add')}>
-                    + Add Product
-                </button>
-            </div>
-
+            
             {loadingCats && <div className="text-center py-5">Loading Categories...</div>}
 
             {categories.map((cat) => (
@@ -109,28 +103,42 @@ const ProductsList = () => {
                         <div className="row g-3 mt-1 ms-2 ms-md-4">
                             {productsByCategory[cat.name]?.map((product) => (
                                 <div key={product.id} className="col-12 col-xl-6">
-                                    <div className="card border-0 shadow-sm bg-white">
-                                        <div className="card-body d-flex justify-content-between align-items-center py-2">
-                                            <div className="flex-grow-1">
-                                                {/* Product Name */}
-                                                <div className="fw-bold text-dark mb-2">{product.name}</div>
+                                    <div className="card border-0 shadow-sm bg-white h-100">
+                                        <div className="card-body d-flex align-items-center py-2 px-3">
 
-                                                {/* Pricing Information */}
-                                                <div className="d-flex align-items-center gap-3 flex-wrap">
-                                                    {/* Final Price (Discounted) */}
+                                            {/* 1. Thumbnail Image */}
+                                            <div className="me-3">
+                                                <img
+                                                    src={product.thumbnailImage}
+                                                    alt={product.name}
+                                                    className="rounded border"
+                                                    style={{
+                                                        width: "60px",
+                                                        height: "60px",
+                                                        objectFit: "cover",
+                                                        backgroundColor: "#f8f9fa"
+                                                    }}
+                                                />
+                                            </div>
+
+                                            {/* 2. Product Info */}
+                                            <div className="flex-grow-1">
+                                                <div className="fw-bold text-dark mb-1" style={{ fontSize: '0.95rem' }}>
+                                                    {product.name}
+                                                </div>
+
+                                                <div className="d-flex align-items-center gap-2 flex-wrap">
+                                                    {/* Final Price */}
                                                     <span className="text-primary fw-bold">
                                                         ₹{Math.round(product.price - (product.price * product.discount / 100))}
                                                     </span>
 
                                                     {product.discount > 0 && (
                                                         <>
-                                                            {/* Original Price */}
-                                                            <span className="text-muted text-decoration-line-through ">
+                                                            <span className="text-muted text-decoration-line-through small">
                                                                 ₹{product.price}
                                                             </span>
-
-                                                            {/* Discount Percent */}
-                                                            <span className="badge bg-success-subtle text-success border border-success-subtle py-1" style={{ fontSize: '0.7rem' }}>
+                                                            <span className="badge bg-success-subtle text-success border border-success-subtle py-1" style={{ fontSize: '0.65rem' }}>
                                                                 {product.discount}% OFF
                                                             </span>
                                                         </>
@@ -138,10 +146,11 @@ const ProductsList = () => {
                                                 </div>
                                             </div>
 
-                                            {/* Action Buttons */}
-                                            <div className="d-flex gap-2">
+                                            {/* 3. Action Buttons */}
+                                            <div className="d-flex gap-1 ms-2">
                                                 <button
-                                                    className="btn btn-sm btn-outline-secondary"
+                                                    className="btn btn-sm btn-outline-secondary border-0"
+                                                    title="Edit"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         navigate(`edit/${product.id}`, { state: { product } });
@@ -150,7 +159,8 @@ const ProductsList = () => {
                                                     Edit
                                                 </button>
                                                 <button
-                                                    className="btn btn-sm btn-outline-warning text-dark"
+                                                    className="btn btn-sm btn-outline-warning text-dark border-0"
+                                                    title="Variants"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         navigate(`variant/${product.id}`);
@@ -159,7 +169,8 @@ const ProductsList = () => {
                                                     Variants
                                                 </button>
                                                 <button
-                                                    className="btn btn-sm btn-outline-danger"
+                                                    className="btn btn-sm btn-outline-danger border-0"
+                                                    title="Delete"
                                                     disabled={deletingIds.includes(product.id)}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
