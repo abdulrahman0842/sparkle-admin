@@ -7,12 +7,15 @@ const VariantModal = ({ variant, onSave, onClose }) => {
     });
 
     useEffect(() => {
-        if (variant) {
-            setFormData({
-                color: variant.color || "",
-                images: variant.images && variant.images.length > 0 ? variant.images : [""],
-            });
+        function loadVariant() {
+            if (variant) {
+                setFormData({
+                    color: variant.color || "",
+                    images: variant.images && variant.images.length > 0 ? variant.images : [""],
+                });
+            }
         }
+        loadVariant()
     }, [variant]);
 
     const handleChange = (e) => {
@@ -33,15 +36,15 @@ const VariantModal = ({ variant, onSave, onClose }) => {
     const removeImageField = (index) => {
         const updatedImages = formData.images.filter((_, i) => i !== index);
         setFormData(prev => ({
-            ...prev, 
-            images: updatedImages.length === 0 ? [""] : updatedImages 
+            ...prev,
+            images: updatedImages.length === 0 ? [""] : updatedImages
         }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         const cleanedImages = formData.images.filter(img => img.trim() !== "");
-        
+
         if (!formData.color.trim()) return alert("Color name/code is required");
         if (cleanedImages.length === 0) return alert("At least one image URL is required");
 
@@ -49,8 +52,8 @@ const VariantModal = ({ variant, onSave, onClose }) => {
     };
 
     return (
-        <div 
-            className="modal d-block shadow" 
+        <div
+            className="modal d-block shadow"
             style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", backdropFilter: "blur(4px)" }}
             onClick={onClose}
         >
@@ -88,7 +91,7 @@ const VariantModal = ({ variant, onSave, onClose }) => {
                                             value={formData.color.startsWith("#") ? formData.color : "#000000"}
                                             onChange={(e) => setFormData(prev => ({ ...prev, color: e.target.value }))}
                                         />
-                                        <small className="text-muted" style={{fontSize: '10px'}}>Picker</small>
+                                        <small className="text-muted" style={{ fontSize: '10px' }}>Picker</small>
                                     </div>
                                 </div>
                             </div>
@@ -101,14 +104,14 @@ const VariantModal = ({ variant, onSave, onClose }) => {
                                     Product Images
                                     <span className="badge bg-primary-subtle text-primary">{formData.images.length} Slot(s)</span>
                                 </label>
-                                
+
                                 <div className="row g-3">
                                     {formData.images.map((img, index) => (
                                         <div key={index} className="col-12 col-md-6">
                                             <div className="card bg-light border-0">
                                                 <div className="card-body p-2">
                                                     {/* Preview Box */}
-                                                    <div 
+                                                    <div
                                                         className="mb-2 rounded border d-flex align-items-center justify-content-center bg-white"
                                                         style={{ height: "120px", overflow: "hidden" }}
                                                     >
@@ -118,7 +121,7 @@ const VariantModal = ({ variant, onSave, onClose }) => {
                                                             <small className="text-muted">Image Preview</small>
                                                         )}
                                                     </div>
-                                                    
+
                                                     <div className="input-group input-group-sm">
                                                         <input
                                                             type="text"
@@ -128,8 +131,8 @@ const VariantModal = ({ variant, onSave, onClose }) => {
                                                             onChange={(e) => handleImageChange(index, e.target.value)}
                                                         />
                                                         {formData.images.length > 1 && (
-                                                            <button 
-                                                                type="button" 
+                                                            <button
+                                                                type="button"
                                                                 className="btn btn-danger"
                                                                 onClick={() => removeImageField(index)}
                                                             >
