@@ -28,7 +28,7 @@ export const updateProduct = async (product) => {
     try {
         let { data, error } = await supabase.from('products').update(product).eq("id", product.id).select().single()
         console.log("DATA:", data, "   ERROR:", error)
-        if (error) throw new Error(error)
+        if (error) throw new error
         return data
     } catch (error) {
         console.log("Error:", error)
@@ -61,7 +61,7 @@ export const getProductById = async (id) => {
 }
 export const getProductsByCategory = async (categoryName) => {
     try {
-        const { data, error } = await supabase.from('products_with_variants').select('*').eq('category', categoryName)
+        const { data, error } = await supabase.from('products').select('*').eq('category', categoryName)
         if (error) throw new Error(error)
         return data ?? []
     } catch (error) {
