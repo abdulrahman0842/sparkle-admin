@@ -1,7 +1,7 @@
 import { supabase } from "./supabaseClient.js";
 
 export const addProduct = async (product) => {
-    const { name, description, price, category, thumbnailImage } = product;
+    const { name, description, price, category, thumbnailImage, discount } = product;
     const { data, error } = await supabase
         .from("products")
         .insert([
@@ -10,6 +10,7 @@ export const addProduct = async (product) => {
                 description,
                 price: Number(price),
                 category,
+                discount,
                 thumbnailImage,
             },
         ])
