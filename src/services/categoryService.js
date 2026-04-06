@@ -9,8 +9,8 @@ export async function getCategories() {
     return data || [];
 }
 
-export async function addCategory(name) {
-    const payload = { name };
+export async function addCategory({ name, image }) {
+    const payload = { name, image };
     const { data, error } = await supabase
         .from('categories')
         .insert(payload)
@@ -19,8 +19,10 @@ export async function addCategory(name) {
     return data;
 }
 
-export async function updateCategory(id, name) {
-    const payload = { name };
+export async function updateCategory(id, { name, image }) {
+    console.log("updaye".name,image)
+    const payload = { name, image };
+
     const { data, error } = await supabase
         .from('categories')
         .update(payload)

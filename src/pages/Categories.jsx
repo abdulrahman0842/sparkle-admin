@@ -175,7 +175,7 @@ const Categories = () => {
                                 <tr><td colSpan="3">Loading...</td></tr>
                             ) : (
                                 categories.map(cat => (
-                                    <tr key={cat.id}>
+                                    <tr key={cat.name}>
                                         <td>
                                             <img 
                                                 src={cat.image} 
