@@ -45,15 +45,14 @@ export const addVariant = async (variant) => {
 };
 
 export const updateVariant = async (variant) => {
-    
-    const { color,  images } = variant;
+
+    const { color, images, in_stock } = variant;
     try {
         const { data, error } = await supabase
             .from('product_variants')
-            .update({ color: color,images: images })
+            .update({ color: color, images: images, in_stock: in_stock })
             .eq('id', variant.id)
             .select()
-        console.log('data', data, 'error', error)
         if (error) throw new Error(error.message);
         return data;
     } catch (err) {

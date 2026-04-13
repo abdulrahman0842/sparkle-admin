@@ -70,6 +70,24 @@ const Variant = () => {
         }
     }
 
+
+    // Add this helper function inside the Variant component
+    async function toggleStockStatus(variant) {
+        const updatedStatus = !variant.in_stock;
+        const backup = variants;
+
+        // Optimistic Update
+        setVariants(prev => prev.map(v =>
+            v.id === variant.id ? { ...v, in_stock: updatedStatus } : v
+        ));
+
+        try {
+            await updateVariant({ ...variant, in_stock: updatedStatus });
+        } catch (err) {
+            setVariants(backup); // Rollback on failure
+            setError("Failed to update stock status", err.message);
+        }
+    }
     return (
         <div className="container mt-4">
             {/* 1. Product Header Section */}
@@ -123,6 +141,7 @@ const Variant = () => {
                                 <tr>
                                     <th className="ps-3">Image</th>
                                     <th>Color Detail</th>
+                                    <th>Status</th>
                                     <th className="text-end pe-3">Actions</th>
                                 </tr>
                             </thead>
@@ -150,6 +169,24 @@ const Variant = () => {
                                                 <span className="text-uppercase small fw-bold">{variant.color}</span>
                                             </div>
                                             <small className="text-muted">{variant.images?.length || 0} total images</small>
+                                        </td>
+                                        <td>
+                                            <div className="form-check form-switch">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    role="switch"
+                                                    checked={variant.in_stock ?? true} // Default to true if undefined
+                                                    onChange={() => toggleStockStatus(variant)}
+                                                    style={{ cursor: "pointer" }}
+                                                />
+                                                <label className="small ms-1">
+                                                    {variant.in_stock ?
+                                                        <span className="text-success">In Stock</span> :
+                                                        <span className="text-danger">Out of Stock</span>
+                                                    }
+                                                </label>
+                                            </div>
                                         </td>
                                         <td className="text-end pe-3">
                                             <button
