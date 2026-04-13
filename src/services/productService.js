@@ -62,11 +62,14 @@ export const getProductById = async (id) => {
 }
 export const getProductsByCategory = async (categoryName) => {
     try {
-        const { data, error } = await supabase.from('products').select('*').eq('category', categoryName)
-        if (error) throw new Error(error)
+        const { data, error } = await supabase.from('products').select('*').eq('category', categoryName).order('created_at', {
+            ascending
+                : false
+        })
+        if (error) throw error
         return data ?? []
     } catch (error) {
-        console.log("Error:", error)
+        console.error("Error:", error)
         throw new Error(error)
     }
 
