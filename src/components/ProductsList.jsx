@@ -93,6 +93,11 @@ const ProductsList = () => {
                             {loadingProducts[cat.name] && (
                                 <div className="spinner-border spinner-border-sm text-primary" role="status"></div>
                             )}
+                            {expandedCategories[cat.name] && productsByCategory[cat.name] && (
+                                <span className="badge bg-light text-primary border small fw-normal">
+                                    {productsByCategory[cat.name].length} Products
+                                </span>
+                            )}
                             <span className="text-muted small">
                                 {expandedCategories[cat.name] ? '▲' : '▼'}
                             </span>
@@ -115,7 +120,7 @@ const ProductsList = () => {
 
                                                 />
 
-                                                
+
                                             </div>
 
                                             {/* 2. Product Info */}
